@@ -5,9 +5,9 @@ namespace BibliotecaAPI.Domain.Interfaces
     public interface IPrestamoService
     {
         Task<IEnumerable<Prestamo>> GetPrestamosAsync();
-        Task<Prestamo> GetPrestamoByIdAsync();
-        Task<Prestamo> CreatePrestamoAsync();
-        Task<Prestamo> EditPrestamoAsync();
-        Task<Prestamo> DeletePrestamoAsync();
+        Task<Prestamo> GetPrestamoByIdAsync(Guid id);
+        Task<Prestamo> CreatePrestamoAsync(Prestamo prestamo,   Guid Usuarioid, Guid Libroid);
+        Task<Prestamo> EditPrestamoAsync(Prestamo prestamo);
+        Task<Prestamo> DeletePrestamoAsync(Guid id);
     }
 }
