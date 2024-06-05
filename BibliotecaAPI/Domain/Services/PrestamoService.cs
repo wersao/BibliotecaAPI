@@ -28,14 +28,17 @@ namespace BibliotecaAPI.Domain.Services
         public async Task<Prestamo> CreatePrestamoAsync(Prestamo prestamo, Guid Usuarioid, Guid Libroid)
         {
             try
-            {
-                prestamo.Id = Guid.NewGuid();
-                prestamo.CreatedDate = DateTime.Now;
-                prestamo.FechaPrestamo = DateTime.Now;
+            {                
                 var usuario = await _prestamo.Usuarios.FirstOrDefaultAsync(u => u.Id == Usuarioid);
                 var libro = await _prestamo.Libros.FirstOrDefaultAsync(l => l.Id == Libroid);
                 if (usuario.EstadoPrestamo == false && libro.EstadoPrestamo == false)
                 {
+                    prestamo.Id = Guid.NewGuid();
+                    prestamo.CreatedDate = DateTime.Now;
+                    prestamo.FechaPrestamo = DateTime.Now;
+                    prestamo.IdLibro = Libroid;
+                    prestamo.IdUsuario = Usuarioid;
+                    prestamo.ModifiedDate = DateTime.Now;
                     usuario.EstadoPrestamo = true;
                     libro.EstadoPrestamo = true;
                     await _prestamo.SaveChangesAsync();
@@ -45,6 +48,35 @@ namespace BibliotecaAPI.Domain.Services
                 else return null;
 
 
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                throw new Exception(dbUpdateException.InnerException?.Message ?? dbUpdateException.Message);
+            }
+        }
+
+        public async Task<Prestamo> DevolverPrestamoAsync(Guid guid)
+        {
+            try
+            {
+                var prestamo = await _prestamo.Prestamos.FirstOrDefaultAsync(c => c.Id == guid);
+                if (prestamo == null)
+                {
+                    return null;
+                }
+                else { 
+                prestamo.FechaDevolucion = DateTime.Now;
+                var usuario = await _prestamo.Usuarios.FirstOrDefaultAsync(u => u.Id == prestamo.IdUsuario);
+                var libro = await _prestamo.Libros.FirstOrDefaultAsync(l => l.Id == prestamo.IdLibro);
+                if (usuario.EstadoPrestamo == true && libro.EstadoPrestamo == true)
+                {
+                    usuario.EstadoPrestamo = false;
+                    libro.EstadoPrestamo = false;
+                    await _prestamo.SaveChangesAsync();
+                    return prestamo;
+                }
+                    return prestamo;
+                }
             }
             catch (DbUpdateException dbUpdateException)
             {

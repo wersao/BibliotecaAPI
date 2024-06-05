@@ -42,5 +42,21 @@ namespace BibliotecaAPI.Controllers
                 return NotFound();
             }
         }
+
+        [HttpPut, ActionName("Edit")]
+        [Route("DevolverPrestamo")]
+        public async Task<ActionResult<Prestamo>> DevolverPrestamoAsync(Guid guid)
+        {
+            try
+            {
+                var editPrestamo = await _prestamoService.DevolverPrestamoAsync(guid);
+                if (editPrestamo == null) return NotFound();
+                return Ok(editPrestamo);
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
+        }
     }
 }
