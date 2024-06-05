@@ -5,10 +5,11 @@ namespace BibliotecaAPI.Domain.Interfaces
     public interface IUsuarioService
     {
         Task<IEnumerable<Usuario>> GetUsuariosAsync();
-        Task<Usuario> GetUsuarioByIdAsync();
-        Task<Usuario> CreateUsuarioAsync();
-        Task<Usuario> EditUsuarioAsync();
-        Task<Usuario> DeleteUsuarioAsync();
+        Task<Usuario> GetUsuarioByIdAsync(Guid id);
+        Task<Usuario> CambiarEstadoUsuario(Guid id);
+        Task<Usuario> CreateUsuarioAsync(Usuario usuario);
+        Task<Usuario> EditUsuarioAsync(Usuario usuario);
+        Task<Usuario> DeleteUsuarioAsync(Guid id);
 
     }
 }
