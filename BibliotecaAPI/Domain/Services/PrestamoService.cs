@@ -36,11 +36,11 @@ namespace BibliotecaAPI.Domain.Services
                     prestamo.Id = Guid.NewGuid();
                     prestamo.CreatedDate = DateTime.Now;
                     prestamo.FechaPrestamo = DateTime.Now;
-                    prestamo.IdLibro = Libroid;
-                    prestamo.IdUsuario = Usuarioid;
-                    prestamo.ModifiedDate = DateTime.Now;
+                    prestamo.IdLibro = Libroid; 
+                    prestamo.IdUsuario= Usuarioid;
                     usuario.EstadoPrestamo = true;
                     libro.EstadoPrestamo = true;
+                    _prestamo.Prestamos.Add(prestamo);
                     await _prestamo.SaveChangesAsync();
                     return prestamo;
                 }
@@ -65,7 +65,6 @@ namespace BibliotecaAPI.Domain.Services
                     return null;
                 }
                 else { 
-                prestamo.FechaDevolucion = DateTime.Now;
                 var usuario = await _prestamo.Usuarios.FirstOrDefaultAsync(u => u.Id == prestamo.IdUsuario);
                 var libro = await _prestamo.Libros.FirstOrDefaultAsync(l => l.Id == prestamo.IdLibro);
                 if (usuario.EstadoPrestamo == true && libro.EstadoPrestamo == true)
