@@ -31,6 +31,8 @@ namespace BibliotecaAPI.Domain.Services
             {                
                 var usuario = await _prestamo.Usuarios.FirstOrDefaultAsync(u => u.Id == Usuarioid);
                 var libro = await _prestamo.Libros.FirstOrDefaultAsync(l => l.Id == Libroid);
+                prestamo.EstadoLibro = !libro.EstadoPrestamo;
+                prestamo.EstadoUsuario = !usuario.EstadoPrestamo;
                 if (usuario.EstadoPrestamo == false && libro.EstadoPrestamo == false)
                 {
                     prestamo.Id = Guid.NewGuid();
@@ -40,12 +42,13 @@ namespace BibliotecaAPI.Domain.Services
                     prestamo.IdUsuario= Usuarioid;
                     usuario.EstadoPrestamo = true;
                     libro.EstadoPrestamo = true;
-                    _prestamo.Prestamos.Add(prestamo);
+                    prestamo.EstadoLibro = true;
+                    prestamo.EstadoLibro = true;
+                    _prestamo.Prestamos.Add(prestamo); 
                     await _prestamo.SaveChangesAsync();
                     return prestamo;
                 }
-
-                else return null;
+                else return prestamo;
 
 
             }
@@ -71,6 +74,9 @@ namespace BibliotecaAPI.Domain.Services
                 {
                     usuario.EstadoPrestamo = false;
                     libro.EstadoPrestamo = false;
+                    prestamo.EstadoLibro = false;
+                    prestamo.EstadoUsuario = false;
+                    prestamo.EstadoPrestamo = false;
                     await _prestamo.SaveChangesAsync();
                     return prestamo;
                 }
@@ -83,19 +89,57 @@ namespace BibliotecaAPI.Domain.Services
             }
         }
 
-        public Task<Prestamo> DeletePrestamoAsync(Guid id)
+        public async Task<Prestamo> DeletePrestamoAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var prestamo = await GetPrestamoByIdAsync(id);
+
+                if (prestamo == null)
+                {
+                    return null;
+                }
+
+                _prestamo.Prestamos.Remove(prestamo); 
+                await _prestamo.SaveChangesAsync(); 
+
+                return prestamo;
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                throw new Exception(dbUpdateException.InnerException?.Message ?? dbUpdateException.Message);
+            }
         }
 
-        public Task<Prestamo> EditPrestamoAsync(Prestamo prestamo)
+        public async Task<Prestamo> EditPrestamoAsync(Prestamo prestamo)
         {
-            throw new NotImplementedException();
+            try
+            {
+                prestamo.ModifiedDate = DateTime.Now;
+
+                _prestamo.Prestamos.Update(prestamo); //Virtualizo mi objeto
+                await _prestamo.SaveChangesAsync();
+
+                return prestamo;
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                throw new Exception(dbUpdateException.InnerException?.Message ?? dbUpdateException.Message);
+            }
         }
 
-        public Task<Prestamo> GetPrestamoByIdAsync(Guid id)
+        public async Task<Prestamo> GetPrestamoByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var prestamo = await _prestamo.Prestamos.FirstOrDefaultAsync(c => c.Id == id);
+
+                return prestamo;
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                throw new Exception(dbUpdateException.InnerException?.Message ?? dbUpdateException.Message);
+            }
         }
 
     }
